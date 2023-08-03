@@ -10,14 +10,7 @@ This submodule conforms to the standard :mod:`setuptools`-based "makefile"
 format, instrumenting most high-level installation tasks for this package.
 '''
 
-# ....................{ TODO                               }....................
-#FIXME: Strongly consider migrating to Hatch:
-#    https://hatch.pypa.io
-#We can't *STAND* poetry, but Hatch looks to be another breed entirely.
-#Crucially, PyPA itself has officially adopted Hatch (which is a huge boost),
-#Hatch supports dynamic retrieval of version specifiers from Python modules,
-#support for PEPs denigrated by poetry authors, and probably much more.
-#Basically, Hatch looks like everything we wish poetry was.
+
 
 # ....................{ KLUDGES ~ path                     }....................
 # Explicitly register all files and subdirectories of the root directory
@@ -107,113 +100,6 @@ _notify_beartype()
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 import setuptools
 from beartype import meta
-
-# ....................{ METADATA ~ seo                     }....................
-_KEYWORDS = [
-    'type checking',
-    'type hints',
-    'PEP 483',
-    'PEP 484',
-    'PEP 544',
-    'PEP 563',
-    'PEP 585',
-    'PEP 586',
-    'PEP 589',
-    'PEP 593',
-    'PEP 604',
-    'PEP 3141',
-]
-'''
-List of all lowercase alphabetic keywords synopsising this package.
-
-These keywords may be arbitrarily selected so as to pretend to improve search
-engine optimization (SEO). In actuality, they do absolutely nothing.
-'''
-
-# ....................{ METADATA ~ seo : classifiers       }....................
-# To minimize desynchronization woes, all
-# "Programming Language :: Python :: "-prefixed strings are dynamically
-# appended to this list by the init() function below.
-_CLASSIFIERS = [
-    # PyPI-specific version type. The number specified here is a magic constant
-    # with no relation to this package's version numbering scheme. *sigh*
-    'Development Status :: 5 - Production/Stable',
-
-    # Miscellaneous metadata.
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: MIT License',
-    'Natural Language :: English',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python :: 3 :: Only',
-    'Topic :: Software Development :: Code Generators',
-    'Topic :: Software Development :: Libraries :: Python Modules',
-    'Topic :: Software Development :: Quality Assurance',
-    'Typing :: Typed',
-]
-'''
-List of all PyPI-specific trove classifier strings synopsizing this project.
-
-Each such string *must* contain either two or three ``" :: "`` substrings
-delimiting human-readable capitalized English words formally recognized by the
-:mod:`distutils`-specific ``register`` command.
-
-See Also
-----------
-https://pypi.org/classifiers
-    Plaintext list of all trove classifier strings recognized by PyPI.
-'''
-
-
-def _sanitize_classifiers(
-    python_version_min_parts: tuple,
-    python_version_minor_max: int,
-) -> list:
-    '''
-    List of all PyPI-specific trove classifier strings synopsizing this
-    package, manufactured by appending classifiers synopsizing this
-    package's support for Python major versions (e.g.,
-    ``Programming Language :: Python :: 3.6``, a classifier implying this
-    package to successfully run under Python 3.6) to the global list
-    :data:`_CLASSIFIERS` of static classifiers.
-
-    Parameters
-    ----------
-    python_version_min_parts : tuple
-        Minimum fully-specified version of Python required by this package
-        as a tuple of integers (e.g., ``(3, 5, 0)`` if this package
-        requires at least Python 3.5.0).
-    python_version_minor_max : int
-        Maximum minor stable version of the current Python 3.x mainline (e.g.,
-        ``9`` if Python 3.9 is the most recent stable version of Python 3.x).
-
-    Returns
-    ----------
-    list
-        List of all sanitized PyPI-specific trove classifier strings.
-    '''
-    assert isinstance(python_version_min_parts, tuple), (
-        f'"{python_version_min_parts}" not tuple.')
-    assert isinstance(python_version_minor_max, int), (
-        f'"{python_version_minor_max}" not integer.')
-
-    # Major version of Python required by this package.
-    PYTHON_VERSION_MAJOR = python_version_min_parts[0]
-
-    # List of classifiers to return, copied from the global list for safety.
-    classifiers_sane = _CLASSIFIERS[:]
-
-    # For each minor version of Python 3.x supported by this package,
-    # formally classify this version as such.
-    for python_version_minor in range(
-        python_version_min_parts[1], python_version_minor_max + 1):
-        classifiers_sane.append(
-            f'Programming Language :: Python :: '
-            f'{PYTHON_VERSION_MAJOR}.{python_version_minor}'
-        )
-    # print('classifiers: {}'.format(_CLASSIFIERS))
-
-    # Return this sanitized list of classifiers.
-    return classifiers_sane
 
 # ....................{ OPTIONS                            }....................
 # Setuptools-specific options. Keywords not explicitly recognized by either

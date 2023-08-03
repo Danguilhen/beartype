@@ -48,19 +48,292 @@
 
 # ....................{ BUILDING                           }....................
 [build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-# List of all Python packages required to build (i.e., install) this project
-# from both codebase tarballs and binary wheels.
+[project]
+description = "Unbearably fast runtime type checking in pure Python."
+readme = "README.rst"
+requires-python = ">=3.8.0"
+license = "MIT"
+authors = [{ name = "Cecil Curry, et al.", email = "leycec@gmail.com" }]
+maintainers = [{ name = "Cecil Curry, et al.", email = "leycec@gmail.com" }]
+keywords = [
+    'type checking',
+    'type hints',
+    'PEP 483',
+    'PEP 484',
+    'PEP 544',
+    'PEP 563',
+    'PEP 585',
+    'PEP 586',
+    'PEP 589',
+    'PEP 593',
+    'PEP 604',
+    'PEP 3141',
+]
+classifiers = [
+    # PyPI-specific version type. The number specified here is a magic constant
+    # with no relation to this package's version numbering scheme. *sigh*
+    'Development Status :: 5 - Production/Stable',
+
+    # Miscellaneous metadata.
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: MIT License',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Topic :: Software Development :: Code Generators',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: Software Development :: Quality Assurance',
+    'Typing :: Typed',
+]
+name = "beartype"
+dynamic = ["version"]
+
+[project.urls]
+Releases = "https://github.com/beartype/beartype/releases"
+Source = "https://github.com/beartype/beartype"
+Issues = "https://github.com/beartype/beartype/issues"
+Documentation = "https://beartype.readthedocs.io"
+Download = "https://github.com/beartype/beartype/releases/latest"
+Homepage = "https://beartype.readthedocs.io"
+Forums = "https://github.com/beartype/beartype/discussions"
+
+[tool.hatch.envs.dev]
+extra-dependencies = [ # TODO tomorrow after getting some sleep
+]
+
+[tool.pytest.ini_options]
+# Project-wide pytest configuration, applied to all invocations of the pytest
+# test runner within this project.
+
+# Newline-delimited list of all custom warning filters applied by this test
+# suite. Recognized strings include:
+# * "default", printing the first occurrence of matching warnings for each
+#   location (module + line number) where the warning is issued.
+#   Unsurprisingly, this is pytest's default. Surprisingly, the resulting
+#   output is overly fine-grained to the point of stripping all caller context
+#   and thus being mostly useless: e.g.,
+#       betse_test/func/sim/solve/test_sim_fast.py::test_cli_sim_fast
+#         /usr/lib/python3.7/site-packages/numpy/core/_asarray.py:83: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray
+#           return array(a, dtype, copy=False, order=order)
+#   Note that pytest reports the warning as originating from within a private
+#   NumPy submodule, which it technically does but which communicates no
+#   practical meaning with respect to our codebase.
+# * "error", turning matching warnings into exceptions. Ideally, pytest would
+#   support a filter printing tracebacks on warnings. Since it fails to do so,
+#   implicitly printing tracebacks by coercing non-fatal warnings into fatal
+#   exceptions is our next best least worst solution.
+filterwarnings = [
+    "error",
+    # Implicitly coerce all non-fatal warnings into fatal exceptions.
+    "ignore:^'cgi' is deprecated and slated for removal in Python 3.13$:DeprecationWarning:babel.messages.catalog",
+    # Avoid coercing all non-fatal warnings matching one or more of the
+    # following patterns formatted as:
+    #     ignore:{warning_message}:{warning_classname}:{module_name}
+    #
+    # ...where:
+    # * "{warning_message}" is a regular expression matching the plaintext of
+    #   the warning message to be ignored.
+    # * "{warning_classname}" is the fully-qualified classname of the warning
+    #   to be ignored.
+    # * "{module_name}" is the fully-qualified name of the module emitting the
+    #   warning to be ignored.
+    #
+    # For example:
+    #     ignore:^Use of \.\. or absolute path in a resource path.*:DeprecationWarning:pkg_resources
+    #
+    # See also:
+    # * https://docs.python.org/3/library/warnings.html and
+    # * https://docs.pytest.org/en/latest/warnings.html
+]
+
+# Newline-delimited list of all custom marks applied by this test suite.
+# Failing to explicitly list such marks here induces non-fatal warnings: e.g.,
+#     /usr/lib64/python3.6/site-packages/_pytest/mark/structures.py:335
+#       /usr/lib64/python3.6/site-packages/_pytest/mark/structures.py:335:
+#       PytestUnknownMarkWarning: Unknown pytest.mark.noop - is this a typo?
+#       You can register custom marks to avoid this warning - for details, see
+#       https://docs.pytest.org/en/latest/mark.html
+#         PytestUnknownMarkWarning,
+markers = [
+    "noop: meaningless placeholder mark required to conditionally skip tests",
+]
+# ....................{ LOGGING                             }...................
+#FIXME: Uncomment to print logging messages.
+#; # If true, captures and prints logging messages whose level is at least
+#; # {log_cli_level} or higher. (Defaults to false.)
+#; log_cli = True
+#;
+#; # Minimum level of logging messages to be captured and printed if {log_cli} is
+#; # true. (Defaults to "INFO".)
+#; log_cli_level = DEBUG
+
+# ....................{ OPTIONS                             }...................
+#FIXME: Conditionally support the following plugin-based options in an
+#appropriate setuptools command when the requisite plugin is importable:
 #
-# Note that:
-# * Setuptools 50.0 is fundamentally broken in numerous ways (including ways
-#   that both break and do not break installation of this project) and *MUST*
-#   thus be blacklisted. See also:
-#   https://github.com/pypa/setuptools/issues/2350
-#   https://github.com/pypa/setuptools/issues/2352
-#   https://github.com/pypa/setuptools/issues/2353
-requires = ['setuptools !=50.0']
+#* "--instafail", immediately printing test output rather than delaying such
+#  output until after all tests complete. This requires the "pytest-instafail"
+#  plugin. Note that this may not necessarily play nicely with the
+#  "--capture=no" option leveraged below. Consider further testing.
+#FIXME: Pass "--ff" and "--tb=auto" when all test machines have a sufficiently
+#new version of pytest installed.
 
-# Explicitly notify "pip" that we leverage the top-level "setuptools"-backed
-# "setup.py" script as our installation infrastructure.
-build-backend = 'setuptools.build_meta'
+# Unconditionally pass the following command-line options to all invocations of
+# the "pytest" command. Dismantled, this is:
+#
+# * "-v", increasing verbosity.
+# * "--full-trace", printing a full traceback on keyboard interrupts (e.g.,
+#   hitting <Ctrl-C> during testing at the command line).
+# * "-p no:xvfb", disabling the "pytest-xvfb" plugin for this CLI-only project.
+#   Although technically harmless, this plugin unconditionally logs extraneous
+#   messages that hamper readability of pytest output. Ergo, it goes.
+# * "-r a", increasing verbosity of (a)ll types of test summaries.
+# * "-s", disable all stdout and stderr capturing.
+# * "--doctest-glob=", disabling implicit detection of doctests (i.e., tests
+#   embedded in docstrings that double as human-readable examples). By default,
+#   pytest runs all files matching the recursive glob "**/test*.txt" through
+#   the standard "doctest" module. Since this project employs explicit tests
+#   rather than implicit doctests, this detection is a non-fatal noop in the
+#   best case and a fatal conflict in the worst case. For collective sanity,
+#   this detection *MUST* be disabled.
+# * "--failed-first", prioritizing tests that failed ahead of tests that
+#   succeeded on the most recent test run. Actually, this option has been
+#   temporarily omitted. Why? Because serial tests currently fail to implicitly
+#   require prerequisite tests (e.g., "test_cli_sim_default[sim]" fails to
+#   require "test_cli_sim_default[seed]"), thus requiring that tests be run
+#   *ONLY* in the default ordering.
+# * "--showlocals", printing local variable values in tracebacks.
+# * "--tb=native", printing tracebacks in the same manner as tracebacks printed
+#   by Python itself for uncaught exceptions. By default, pytest prints
+#   tracebacks in an extremely colourful (which is nice) but unreadable (which
+#   is *NOT* nice) manner.
+#
+# See "pytest --help | less" for further details on available options.
+addopts = "-v --showlocals -p no:xvfb -r a --doctest-glob="
+# addopts = "-v --showlocals -p no:xvfb -r a --doctest-glob= -s"
+# addopts = "-v -p no:xvfb -r a --doctest-glob= --showlocals --tb=native"
+# addopts = "-vvvv --showlocals -p no:xvfb -r a --doctest-glob=""
+# addopts = "-vvvv --showlocals -p no:xvfb -r a --doctest-glob= -s"
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# CAUTION: The "--full-trace" option now inadvertently produces absurdly
+# verbose, largely unreadable tracebacks. (You have been warned.)
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# addopts = "-v --full-trace --showlocals -p no:xvfb -r a --doctest-glob=""
+
+# Minimum version of pytest required by:
+#
+# * The "--failed-first" option enabled by default above.
+# minversion = 2.8.0
+
+# Whitespace-delimited list of the relative paths of all top-level directories
+# containing tests. All Python scripts with basenames prefixed by "test_" in
+# all subdirectories of these directories including these directories
+# themselves will be parsed for:
+#
+# * Functions whose names are prefixed by "test_".
+# * Classes whose names are prefixed by "Test".
+testpaths = ["beartype_test"]
+# ....................{ OPTIONS ~ plugin                    }...................
+# Options specific to third-party pytest plugins.
+#
+# Command-line options pertaining to plugins include:
+#     $ pytest --trace-config  # List all active and available plugins.
+
+[tool.mypy]
+# Comma-separated string listing the pathnames of all project paths to be
+# checked by mypy by default if none are explicitly passed on the command line.
+files = "beartype/"
+
+# To quote mypy's official CLI documentation: 
+#     "By default, imported values to a module are treated as exported and mypy
+#      allows other modules to import them. This flag changes the behavior to
+#      not re-export unless the item is imported using from-as or is included
+#      in __all__. Note this is always treated as enabled for stub files."
+# We don't pretend to understand the low-level nuance between those two
+# behaviours, but now explicitly enable the latter behaviour to resolve #57.
+no_implicit_reexport = true
+
+# Display machine-readable "["- and "]"-bracketed error codes in *ALL*
+# mypy-specific error messages. This option is disabled by default, which is
+# awful, because these codes are the *ONLY* means of explicitly ignoring
+# specific mypy errors with "# type: ignore[{error_code}]" comments littered
+# throughout this project's codebase. Type-checked serenity now!
+show_error_codes = true
+
+# ....................{ LIB                                 }...................
+# Implicitly ignore missing type hints in third-party optional dependencies, an
+# automated alternative to literring our codebase with "# type: ignore[import]"
+# pragmas on every import from these dependencies. See also:
+#    https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-type-hints-for-third-party-library
+
+[[tool.mypy.overrides]]
+module = ['metadata.*', 'numpy.*', 'pkg_resources.*']
+ignore_missing_imports = true
+
+[tool.coverage.run]
+# Low-level settings configuring how coverage is measured.
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# CAUTION: "coverage" is fragile and well-known to silently fail to behave as
+# expected if the option "source = ." is *NOT* explicitly specified here.
+# Notably, enabling the following option succeeds when generating CLI-based
+# reports but inexplicably fails when generating XML-formatted reports:
+#     # Comma- or newline-separated list of package names to be measured.
+#     source_pkgs = beartype
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Comma- or newline-separated list of all pathnames and/or package names to be
+# measured. Note that this should typically *NEVER* be modified.
+source = "."
+
+# Comma- or newline-separated list of glob-formatted pathnames to be omitted
+# from measurement, specified only for completeness.
+omit = "beartype_test/*"
+
+# Measure branch coverage in additional to the default statement coverage.
+# Whereas statement coverage only measures the lower-level unintelligent metric
+# of the total number of executed statements, branch coverage measures the
+# higher-level intelligent metric of the total number of executed branch
+# destinations (i.e., the two or more target statements to which a source
+# branch may "jump" conditionally depending on the decision computed by that
+# branch). Branches include "if", "elif", "else", and "while" statements.
+#
+# See also: https://coverage.readthedocs.io/en/latest/branch.html#branch
+branch = true
+
+[tool.coverage.report]
+# High-level settings configuring how coverage reports measurements.
+
+# Comma- or newline-separated list of all pathnames measured above to be
+# included in on-disk reports.
+include = "beartype/*"
+
+# If the total coverage measurement falls under this number, exit with a
+# "coverage"-specific failure status code of 2.
+#
+# Note this number should be suffixed by at most a number of fractional digits
+# equal to the "precision" setting defined below.
+fail_under = 75.00
+
+# Number of fractional digits to display for reported coverage percentages
+# *AND* constrain the "fail_under" setting defined above to.
+precision = 2
+
+# Add a column "Missing" listing the comma-delimited line number ranges of all
+# missing lines for each covered submodule to coverage reports.
+show_missing = true
+
+[tool.coverage.html]
+# Low-level settings configuring how coverage emits format-specific reports.
+directory = "./coverage.html"
+
+[tool.coverage.xml]
+# output = "./coverage.xml"
